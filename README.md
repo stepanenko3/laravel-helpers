@@ -5,13 +5,10 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/stepanenko3/laravel-helpers.svg?style=flat-square)](https://packagist.org/packages/stepanenko3/laravel-helpers)
 [![License](https://poser.pugx.org/stepanenko3/laravel-helpers/license)](https://packagist.org/packages/stepanenko3/laravel-helpers)
 
-![screenshot of cards](screenshots/cards.png)
-![screenshot of cards](screenshots/cards-2.png)
-
 ## Requirements
 
 - `php: >=8.0`
-- `laravel/framework: ^8.0`
+- `laravel/framework: ^9.0`
 
 ## Installation
 
