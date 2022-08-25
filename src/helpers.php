@@ -7,6 +7,22 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
 
+if (!function_exists('rglob')) {
+    function rglob($pattern)
+    {
+        $files = glob($pattern);
+
+        foreach (glob(dirname($pattern) . '/*', GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
+            $files = array_merge(
+                [],
+                ...[$files, rglob($dir . '/' . basename($pattern))],
+            );
+        }
+
+        return $files;
+    }
+}
+
 if (!function_exists('readableMemory')) {
     /**
      * readableMemory
