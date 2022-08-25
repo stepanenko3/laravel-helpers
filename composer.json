@@ -1,0 +1,25 @@
+{
+    "name": "stepanenko3/laravel-helpers",
+    "description": "Helpers for laravel",
+    "keywords": [
+        "laravel",
+        "helpers"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=8.0",
+        "laravel/framework": "^9.0",
+        "hashids/hashids": "^4.1",
+        "ramsey/uuid": "^4.0"
+    },
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
