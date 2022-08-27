@@ -24,7 +24,7 @@ if (!function_exists('rglob')) {
 }
 
 if (!function_exists('formatMemory')) {
-    function formatMemory(float $size, int $level = 0, int $precision = 2, int $base = 1024, $asArray = false): string
+    function formatMemory(float $size, int $level = 0, int $precision = 2, int $base = 1024, $asArray = false): string|array
     {
         $unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $times = floor(log($size, $base));
