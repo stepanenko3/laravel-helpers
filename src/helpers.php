@@ -23,27 +23,23 @@ if (!function_exists('rglob')) {
     }
 }
 
-if (!function_exists('readableMemory')) {
-    /**
-     * readableMemory
-     *
-     * @param  mixed $memory
-     * @param  bool $startFromBytes
-     * @param  bool $withUnit
-     * @return mixed
-     */
-    function readableMemory($memory, $startFromBytes = false, $withUnit = true)
+if (!function_exists('formatMemory')) {
+    function formatMemory(float $size, int $level = 0, int $precision = 2, int $base = 1024, $asArray = false): string
     {
-        $i = floor(log($memory) / log(1024));
-        $sizes = ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        if ($startFromBytes) array_unshift($sizes, 'B');
+        $unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $times = floor(log($size, $base));
 
-        if ($withUnit)
-            return sprintf('%.02F', $memory / pow(1024, $i)) * 1 . ' ' . $sizes[$i];
-        else return [
-            'memory' => sprintf('%.02F', $memory / pow(1024, $i)) * 1,
-            'unit' => $sizes[$i],
-        ];
+        $memory = sprintf('%.' . $precision . 'f', $size / pow($base, ($times + $level)));
+        $unit = $unit[$times + $level];
+
+        if ($asArray) {
+            return [
+                'memory' => $memory,
+                'unit' => $unit,
+            ];
+        }
+
+        return $memory . ' ' . $unit;
     }
 }
 
