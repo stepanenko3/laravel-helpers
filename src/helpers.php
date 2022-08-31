@@ -7,6 +7,21 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
 
+
+if (!function_exists('getAspectRatio')) {
+    function getAspectRatio(int $width, int $height)
+    {
+        // search for greatest common divisor
+        $greatestCommonDivisor = static function ($width, $height) use (&$greatestCommonDivisor) {
+            return ($width % $height) ? $greatestCommonDivisor($height, $width % $height) : $height;
+        };
+
+        $divisor = $greatestCommonDivisor($width, $height);
+
+        return $width / $divisor . ':' . $height / $divisor;
+    }
+}
+
 if (!function_exists('rglob')) {
     function rglob($pattern)
     {
