@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
 
-
 if (!function_exists('getAspectRatio')) {
     function getAspectRatio(int $width, int $height)
     {
