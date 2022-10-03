@@ -20,8 +20,9 @@ composer require stepanenko3/laravel-helpers
 ## Usage
 
 Included functions:
+
 ```php
-    apply_condition(mixed $amount, mixed $conditionValue = null): float
+    apply_condition(string|int|float $amount, string|null $conditionValue = null): float
 
     camel_to_snake_case(string $input): string
 
@@ -31,13 +32,13 @@ Included functions:
 
     class_by_key(string $key, string $service = 'Models'): ?string
 
-    cleanConditionValue($value): string|array
+    cleanConditionValue(string|array $value): string|array
 
     closetags(string $html): string
 
-    condition_value(mixed $amount, mixed $conditionValue = null): float|int
+    condition_value(string|int|float $amount, string|null $conditionValue = null): string|int|float
 
-    contrast_color($hexColor): string
+    contrast_color(string $hexColor): string
 
     distance(
         string|float|int $latitudeFrom, 
@@ -64,7 +65,7 @@ Included functions:
 
     format_weight(float|int|string $weight): string
 
-    from_timestamp($timestamp): Carbon
+    from_timestamp(string|int $timestamp): Carbon
 
     get_ascii_key(string $needle, array $haystack = []): ?int
 
@@ -72,13 +73,13 @@ Included functions:
 
     get_by_ascii(string $needle, array $haystack = []): mixed
 
-    get_initials($name): array|string|null
+    get_initials(string $name): array|string|null
 
     get_ip(): string
 
     get_order_id(string|int $id): string
 
-    get_query_raw(mixed $builder): string
+    get_query_raw(EloquentBuilder|QueryBuilder $builder): string
 
     hashid_decode(string|int $id): array
 
@@ -86,12 +87,12 @@ Included functions:
 
     in_array_wildcard(mixed $needle, array $haystack): bool
 
-    ipv4_in_range(mixed $ip, mixed $range): bool
+    ipv4_in_range(mixed $ip, array|string $range): bool
 
     ipv4_match_mask(string $ip, string $network): bool
 
     is_day(
-        mixed $timestamp = null, 
+        string|int|null $timestamp = null, 
         float $lat = 50.458124677588046, 
         float $lng = 30.51755711378018
     ): bool
@@ -99,44 +100,45 @@ Included functions:
     is_digit(mixed $value): bool
 
     is_night(
-        mixed $timestamp = null, 
+        string|int|null $timestamp = null, 
         float $lat = 50.458124677588046, 
         float $lng = 30.51755711378018
     ): bool
 
-    is_query_joined(mixed $query, string $table): bool
+    is_query_joined(EloquentBuilder|QueryBuilder $query, string $table): bool
 
     key_by_class(mixed $class): ?string
 
     mb_lcfirst(string $string): string
 
-    mb_pathinfo($path, string $opt = ''): array|string
+    mb_pathinfo(string $path, string $opt = ''): array|string
 
     mb_ucfirst(string $string): string
 
     model_by_key(string $key): ?string
 
-    normalizePrice($price): float
+    normalizePrice(string|int|float $price): float
 
-    number(mixed $value, null|int $decimals = 0): string
+    number(string|int|float $value, null|int $decimals = 0): string
 
     num_pad(string|int $value, int $length = 8): string
 
     plural_text(string $text, string $endings): string
 
+    // Example usage: str_plural_ru('черновик', 2, '|а|ов'); # Return: черновика
     plural_word(string $word, int $count, string $endings): string
 
     remove_query_param(string $url, string $param): string
 
-    renderBlade($string, $data = null): bool|string
+    renderBlade(string $string, array|null $data = null): false|string
 
-    rglob($pattern): bool|array
+    rglob(string $pattern): array|false
 
     seo_replace(string $str, array $attributes = []): string
 
-    storage_url($path, $disk = null): string
+    storage_url(string $path, string|null $disk = null): string
 
-    str_contains(mixed $haystack, mixed $needles): bool
+    str_contains(string $haystack, array $needles): bool
 
     toggle_url(
         string $key, 
@@ -146,27 +148,26 @@ Included functions:
 
     translit_to_ua(string $text): string
 
-    truncate_html($text, int $length = 100, array $options = []): mixed
+    truncate_html(string $text, int $length = 100, array $options = []): string
 
-    url_data($string, string $action = 'encrypt'): bool|string
+    url_data(string $string, string $action = 'encrypt'): bool|string
 
-    user(): User
+    user(): \App\Models\User
 
-    utf8ize(mixed $d): string
+    utf8ize(array|string $d): string
 
     uuid(int $version = 6): string
 
     validateDate(string $date, string $format = 'Y-m-d'): bool
 
-    valueIsPercentage($value): bool
+    valueIsPercentage(string $value): bool
 
-    valueIsToBeAdded($value): bool
+    valueIsToBeAdded(string $value): bool
 
-    valueIsToBeSubtracted($value): bool
+    valueIsToBeSubtracted(string $value): bool
 
-    youtube_id($url): mixed
+    youtube_id(string $url): string
 ```
-
 
 ## Credits
 
