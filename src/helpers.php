@@ -100,7 +100,7 @@ if (!function_exists('contrast_color')) {
 }
 
 if (!function_exists('carbon')) {
-    function carbon(string|null $parseString = '', string $tz = null): Carbon
+    function carbon(DateTimeInterface|string|null $parseString = '', string $tz = null): Carbon
     {
         return new Carbon($parseString, $tz);
     }
