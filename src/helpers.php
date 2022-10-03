@@ -1,14 +1,19 @@
 <?php
 
-use Illuminate\Support\Str;
+use App\Models\User;
 use Carbon\Carbon;
 use Hashids\Hashids;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\View\Factory;
 use Ramsey\Uuid\Uuid;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+
 if (!function_exists('getAspectRatio')) {
-    function getAspectRatio(int $width, int $height)
+    function getAspectRatio(int $width, int $height): string
     {
         // search for greatest common divisor
         $greatestCommonDivisor = static function ($width, $height) use (&$greatestCommonDivisor) {
@@ -22,7 +27,7 @@ if (!function_exists('getAspectRatio')) {
 }
 
 if (!function_exists('rglob')) {
-    function rglob($pattern)
+    function rglob(string $pattern): array|false
     {
         $files = glob($pattern);
 
@@ -38,8 +43,13 @@ if (!function_exists('rglob')) {
 }
 
 if (!function_exists('formatMemory')) {
-    function formatMemory(float $size, int $level = 0, int $precision = 2, int $base = 1024, $asArray = false): string|array
-    {
+    function formatMemory(
+        float $size,
+        int $level = 0,
+        int $precision = 2,
+        int $base = 1024,
+        bool $asArray = false,
+    ): string|array {
         $unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $times = floor(log($size, $base));
 
@@ -58,8 +68,9 @@ if (!function_exists('formatMemory')) {
 }
 
 if (!function_exists('get_initials')) {
-    function get_initials($name)
-    {
+    function get_initials(
+        string $name,
+    ): array|string|null {
         $ru = 'АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя';
         $ua = 'АаБбВвГгҐґДдЕеЄєЖжЗзИиIіЇїЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЬьЮюЯя';
 
@@ -68,25 +79,16 @@ if (!function_exists('get_initials')) {
 }
 
 if (!function_exists('user')) {
-    /**
-     * user
-     *
-     * @return App\Models\User;
-     */
-    function user()
+    function user(): User
     {
-        if (request()->is('api/*')) {
-            $user = auth()->guard('api')->user();
-        } else {
-            $user = auth()->user();
-        }
-
-        return $user;
+        return request()->is('api/*')
+            ? auth()->guard('api')->user()
+            : auth()->user();
     }
 }
 
 if (!function_exists('contrast_color')) {
-    function contrast_color($hexColor)
+    function contrast_color(string $hexColor): string
     {
         $r = hexdec(substr($hexColor, 1, 2));
         $g = hexdec(substr($hexColor, 3, 2));
@@ -98,27 +100,14 @@ if (!function_exists('contrast_color')) {
 }
 
 if (!function_exists('carbon')) {
-    /**
-     * carbon
-     *
-     * @param  mixed $parseString
-     * @param  mixed $tz
-     * @return Carbon
-     */
-    function carbon($parseString = '', string $tz = null): Carbon
+    function carbon(string|null $parseString = '', string $tz = null): Carbon
     {
         return new Carbon($parseString, $tz);
     }
 }
 
 if (!function_exists('translit_to_ua')) {
-    /**
-     * translit_to_ua
-     *
-     * @param  string $text
-     * @return string
-     */
-    function translit_to_ua(string $text)
+    function translit_to_ua(string $text): string
     {
         $alphabet = [
             'a' => 'а', 'b' => 'б', 'v' => 'в', 'g' => 'г', 'd' => 'д', 'e' => 'е', 'yo' => 'ё',
@@ -147,29 +136,14 @@ if (!function_exists('translit_to_ua')) {
 }
 
 if (!function_exists('is_digit')) {
-    /**
-     * Deal with normal (and irritating) PHP behavior to determine if
-     * a value is a non-float positive integer.
-     *
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    function is_digit($value)
+    function is_digit(mixed $value): bool
     {
-        return is_bool($value) ? false : ctype_digit((string) $value);
+        return !is_bool($value) && ctype_digit((string)$value);
     }
 }
 
 if (!function_exists('validateDate')) {
-    /**
-     * validateDate
-     *
-     * @param  string $date
-     * @param  string $format
-     * @return bool
-     */
-    function validateDate(string $date, string $format = 'Y-m-d')
+    function validateDate(string $date, string $format = 'Y-m-d'): bool
     {
         $d = DateTime::createFromFormat($format, $date);
         // The Y ( 4 digits year ) returns TRUE for any integer with any number of digits so changing the comparison from == to === fixes the issue.
@@ -178,13 +152,7 @@ if (!function_exists('validateDate')) {
 }
 
 if (!function_exists('format_weight')) {
-    /**
-     * format_weight
-     *
-     * @param  string|int|float $weight
-     * @return string
-     */
-    function format_weight($weight)
+    function format_weight(float|int|string $weight): string
     {
         $string = '';
 
@@ -194,7 +162,7 @@ if (!function_exists('format_weight')) {
         }
 
         if ($weight > 1000) {
-            $string = round($weight / 1000, 0) . 'kg ' . $string;
+            $string = round($weight / 1000) . 'kg ' . $string;
         }
 
         return $string;
@@ -202,39 +170,21 @@ if (!function_exists('format_weight')) {
 }
 
 if (!function_exists('mb_lcfirst')) {
-    /**
-     * mb_lcfirst
-     *
-     * @param  string $string
-     * @return string
-     */
-    function mb_lcfirst(string $string)
+    function mb_lcfirst(string $string): string
     {
         return mb_strtolower(mb_substr($string, 0, 1)) . mb_substr($string, 1);
     }
 }
 
 if (!function_exists('mb_ucfirst')) {
-    /**
-     * mb_ucfirst
-     *
-     * @param  string $string
-     * @return string
-     */
-    function mb_ucfirst(string $string)
+    function mb_ucfirst(string $string): string
     {
         return mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
     }
 }
 
 if (!function_exists('hashid_encode')) {
-    /**
-     * hashid_encode
-     *
-     * @param  string|int $id
-     * @return string
-     */
-    function hashid_encode(string|int $id)
+    function hashid_encode(string|int $id): string
     {
         $hashids = new Hashids();
         return $hashids->encode($id);
@@ -242,13 +192,7 @@ if (!function_exists('hashid_encode')) {
 }
 
 if (!function_exists('hashid_decode')) {
-    /**
-     * hashid_decode
-     *
-     * @param  string|int $id
-     * @return array
-     */
-    function hashid_decode(string|int $id)
+    function hashid_decode(string|int $id): array
     {
         $hashids = new Hashids();
         return $hashids->decode($id);
@@ -256,57 +200,29 @@ if (!function_exists('hashid_decode')) {
 }
 
 if (!function_exists('num_pad')) {
-    /**
-     * num_pad
-     *
-     * @param  string|int $value
-     * @param  int $length
-     * @return string
-     */
-    function num_pad(string|int $value, int $length = 8)
+    function num_pad(string|int $value, int $length = 8): string
     {
         return str_pad($value, $length, '0', STR_PAD_LEFT);
     }
 }
 
 if (!function_exists('get_order_id')) {
-    /**
-     * get_order_id
-     *
-     * @param  string|int $id
-     * @return string
-     */
-    function get_order_id(string|int $id)
+    function get_order_id(string|int $id): string
     {
         return num_pad($id);
     }
 }
 
 if (!function_exists('get_query_raw')) {
-    /**
-     * get_query_raw
-     *
-     * @param  mixed $builder
-     * @return string
-     */
-    function get_query_raw($builder)
+    function get_query_raw(EloquentBuilder|QueryBuilder $builder): string
     {
         $queryRaw = str_replace(array('?'), array('\'%s\''), $builder->toSql());
-        $queryRaw = vsprintf($queryRaw, $builder->getBindings());
-
-        return $queryRaw;
+        return vsprintf($queryRaw, $builder->getBindings());
     }
 }
 
 if (!function_exists('seo_replace')) {
-    /**
-     * seo_replace
-     *
-     * @param  string $str
-     * @param  array $attributes
-     * @return string
-     */
-    function seo_replace(string $str, array $attributes = [])
+    function seo_replace(string $str, array $attributes = []): string
     {
         if ($attributes) {
             $attributes = collect($attributes);
@@ -353,15 +269,10 @@ if (!function_exists('seo_replace')) {
 }
 
 if (!function_exists('is_query_joined')) {
-    /**
-     * is_query_joined
-     *
-     * @param  mixed $query
-     * @param  string $table
-     * @return bool
-     */
-    function is_query_joined($query, $table)
-    {
+    function is_query_joined(
+        EloquentBuilder|QueryBuilder $query,
+        string $table,
+    ): bool {
         $joins = $query->getQuery()->joins;
         if ($joins == null) {
             return false;
@@ -376,21 +287,17 @@ if (!function_exists('is_query_joined')) {
 }
 
 if (!function_exists('normalizePrice')) {
-    /**
-     * normalize price
-     *
-     * @param $price
-     * @return float
-     */
-    function normalizePrice($price)
+    function normalizePrice(string|int|float $price): float
     {
-        return (is_string($price)) ? (float) $price : $price;
+        return (is_string($price)) ? (float)$price : $price;
     }
 }
 
 if (!function_exists('mb_pathinfo')) {
-    function mb_pathinfo($path, $opt = '')
-    {
+    function mb_pathinfo(
+        string $path,
+        string $opt = '',
+    ): array|string {
         $separator = ' qq ';
         $path = preg_replace('/[^ ]/u', $separator . "\$0" . $separator, $path);
         if ($opt == '') $pathinfo = pathinfo($path);
@@ -407,16 +314,11 @@ if (!function_exists('mb_pathinfo')) {
 }
 
 if (!function_exists('toggle_url')) {
-    /**
-     * toggle_url
-     *
-     * @param  string $key
-     * @param  string|null $value
-     * @param  string|null  $url
-     * @return string
-     */
-    function toggle_url(string $key, string|null $value = null, string|null $url = null)
-    {
+    function toggle_url(
+        string $key,
+        string|null $value = null,
+        string|null $url = null,
+    ): string {
         $url = $url ?? request()->url();
 
         $params = request()->all();
@@ -433,15 +335,10 @@ if (!function_exists('toggle_url')) {
 }
 
 if (!function_exists('remove_query_param')) {
-    /**
-     * remove_query_param
-     *
-     * @param  string $url
-     * @param  string $param
-     * @return string
-     */
-    function remove_query_param(string $url, string $param)
-    {
+    function remove_query_param(
+        string $url,
+        string $param,
+    ): string {
         $parsed = parse_url($url);
         $query = $parsed['query'];
 
@@ -451,12 +348,12 @@ if (!function_exists('remove_query_param')) {
         $query = http_build_query($params);
 
         $scheme = isset($parsed['scheme']) ? $parsed['scheme'] . '://' : '';
-        $host = isset($parsed['host']) ? $parsed['host'] : '';
+        $host = $parsed['host'] ?? '';
         $port = isset($parsed['port']) ? ':' . $parsed['port'] : '';
-        $user = isset($parsed['user']) ? $parsed['user'] : '';
-        $pass = isset($parsed['pass']) ? ':' . $parsed['pass']  : '';
+        $user = $parsed['user'] ?? '';
+        $pass = isset($parsed['pass']) ? ':' . $parsed['pass'] : '';
         $pass = ($user || $pass) ? "$pass@" : '';
-        $path = isset($parsed['path']) ? $parsed['path'] : '';
+        $path = $parsed['path'] ?? '';
         $query = $query ? '?' . $query : '';
         $fragment = isset($parsed['fragment']) ? '#' . $parsed['fragment'] : '';
         return "$scheme$user$pass$host$port$path$query$fragment";
@@ -464,24 +361,13 @@ if (!function_exists('remove_query_param')) {
 }
 
 if (!function_exists('distance')) {
-    /**
-     * distance
-     *
-     * @param string|float|int $latitudeFrom
-     * @param string|float|int $longitudeFrom
-     * @param string|float|int $latitudeTo
-     * @param string|float|int $longitudeTo
-     * @param string|float|int $earthRadius
-     *
-     * @return float|int
-     */
     function distance(
         string|float|int $latitudeFrom,
         string|float|int $longitudeFrom,
         string|float|int $latitudeTo,
         string|float|int $longitudeTo,
-        int $earthRadius = 6371000
-    ) {
+        int $earthRadius = 6371000,
+    ): float|int {
         $latFrom = deg2rad($latitudeFrom);
         $lonFrom = deg2rad($longitudeFrom);
         $latTo = deg2rad($latitudeTo);
@@ -493,18 +379,21 @@ if (!function_exists('distance')) {
         $b = sin($latFrom) * sin($latTo) + cos($latFrom) * cos($latTo) * cos($lonDelta);
 
         $angle = atan2(sqrt($a), $b);
+
         return $angle * $earthRadius;
     }
 }
 
 if (!function_exists('renderBlade')) {
-    function renderBlade($string, $data = null)
-    {
+    function renderBlade(
+        string $string,
+        array|null $data = null,
+    ): false|string {
         if (!$data) {
             $data = [];
         }
 
-        $data['__env'] = app(\Illuminate\View\Factory::class);
+        $data['__env'] = app(Factory::class);
 
         $php = Blade::compileString($string);
 
@@ -520,7 +409,7 @@ if (!function_exists('renderBlade')) {
             }
 
             throw $e;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             while (ob_get_level() > $obLevel) {
                 ob_end_clean();
             }
@@ -533,8 +422,11 @@ if (!function_exists('renderBlade')) {
 }
 
 if (!function_exists('truncate_html')) {
-    function truncate_html($text, $length = 100, $options = [])
-    {
+    function truncate_html(
+        string $text,
+        int $length = 100,
+        array $options = [],
+    ): string {
         $default = [
             'ending' => '...',
             'exact' => true,
@@ -630,27 +522,16 @@ if (!function_exists('truncate_html')) {
 }
 
 if (!function_exists('number')) {
-    /**
-     * number
-     *
-     * @param  mixed $value
-     * @param  mixed $decimals
-     * @return string
-     */
-    function number($value, $decimals = 0)
-    {
+    function number(
+        string|int|float $value,
+        null|int $decimals = 0,
+    ): string {
         return number_format($value, $decimals, '.', ' ');
     }
 }
 
 if (!function_exists('utf8ize')) {
-    /**
-     * utf8ize
-     *
-     * @param  mixed $d
-     * @return void
-     */
-    function utf8ize($d)
+    function utf8ize(array|string $d): string
     {
         if (is_array($d)) {
             foreach ($d as $k => $v) {
@@ -664,16 +545,12 @@ if (!function_exists('utf8ize')) {
 }
 
 if (!function_exists('get_ascii_key')) {
-    /**
-     * get_ascii_key
-     *
-     * @param  string $needle
-     * @param  array $haystack
-     * @return mixed
-     */
-    function get_ascii_key(string $needle, array $haystack = [])
-    {
-        if (!$needle || !$haystack) return;
+    function get_ascii_key(
+        string $needle,
+        array $haystack = [],
+    ): ?int {
+        if (!$needle || !$haystack)
+            return null;
 
         $asciiCodeSum = 0;
         $array = str_split($needle);
@@ -686,43 +563,31 @@ if (!function_exists('get_ascii_key')) {
 }
 
 if (!function_exists('get_by_ascii')) {
-    /**
-     * get_by_ascii
-     *
-     * @param  string $needle
-     * @param  array $haystack
-     * @return mixed
-     */
-    function get_by_ascii(string $needle, array $haystack = [])
-    {
+    function get_by_ascii(
+        string $needle,
+        array $haystack = [],
+    ): mixed {
         $asciiKey = get_ascii_key($needle, $haystack);
-        if (!$asciiKey && $asciiKey !== 0) return;
+        if (!$asciiKey && $asciiKey !== 0)
+            return null;
 
         return $haystack[$asciiKey];
     }
 }
 
 if (!function_exists('domain')) {
-    /**
-     * domain
-     *
-     * @return string
-     */
-    function domain()
+    function domain(): string
     {
         return parse_url(request()->url())['host'];
     }
 }
 
 if (!function_exists('is_day')) {
-    /**
-     * is_day
-     *
-     * @param  mixed $timestamp
-     * @return bool
-     */
-    function is_day($timestamp = null, $lat = 50.458124677588046, $lng = 30.51755711378018)
-    {
+    function is_day(
+        string|int|null $timestamp = null,
+        float $lat = 50.458124677588046,
+        float $lng = 30.51755711378018,
+    ): bool {
         $timestamp = $timestamp ?? time();
 
         $suninfo = date_sun_info($timestamp, $lat, $lng);
@@ -735,73 +600,53 @@ if (!function_exists('is_day')) {
 }
 
 if (!function_exists('is_night')) {
-    /**
-     * is_night
-     *
-     * @param  mixed $timestamp
-     * @return bool
-     */
-    function is_night($timestamp = null, $lat = 50.458124677588046, $lng = 30.51755711378018)
-    {
+    function is_night(
+        string|int|null $timestamp = null,
+        float $lat = 50.458124677588046,
+        float $lng = 30.51755711378018,
+    ): bool {
         return !is_day($timestamp, $lat, $lng);
     }
 }
 
 if (!function_exists('class_basename')) {
-    /**
-     * class_basename
-     *
-     * @param  mixed $class
-     * @return string
-     */
-    function class_basename($class)
+    function class_basename(mixed $class): ?string
     {
-        if (!$class) return null;
+        if (!$class)
+            return null;
 
         if (!is_string($class)) {
             $class = get_class($class);
         }
 
         $key = explode('\\', $class);
-        $key = end($key);
 
-        return $key;
+        return (string) end($key);
     }
 }
 
 if (!function_exists('key_by_class')) {
-    /**
-     * key_by_class
-     *
-     * @param  mixed $class
-     * @return string
-     */
-    function key_by_class($class)
+    function key_by_class(mixed $class): ?string
     {
         $class = class_basename($class);
-        if (!$class) return null;
 
-        $key = camel_to_snake_case($class);
+        if (!$class)
+            return null;
 
-        return $key;
+        return camel_to_snake_case($class);
     }
 }
 
 if (!function_exists('class_by_key')) {
-    /**
-     * class_by_key
-     *
-     * @param  string $key
-     * @param  string $service
-     * @return mixed
-     */
-    function class_by_key($key, $service = 'Models')
-    {
+    function class_by_key(
+        string $key,
+        string $service = 'Models',
+    ): ?string {
         $model = Str::camel($key);
         $model = 'App\\' . ucfirst($service) . '\\' . ucfirst($model);
 
         if (class_exists($model)) {
-            return $model;
+            return (string) $model;
         }
 
         return null;
@@ -809,29 +654,19 @@ if (!function_exists('class_by_key')) {
 }
 
 if (!function_exists('model_by_key')) {
-    /**
-     * model_by_key
-     *
-     * @param  string $key
-     * @return mixed
-     */
-    function model_by_key(string $key)
+    function model_by_key(string $key): ?string
     {
-        return class_by_key($key, 'Models');
+        return class_by_key($key);
     }
 }
 
 if (!function_exists('plural_word')) {
-    /**
-     * Example usage: str_plural_ru('черновик', 2, '|а|ов'); # Return: черновика
-     *
-     * @param string $word
-     * @param float $count
-     * @param string $endings
-     * @return string
-     */
-    function plural_word(string $word, $count, string $endings)
-    {
+    // Example usage: str_plural_ru('черновик', 2, '|а|ов'); # Return: черновика
+    function plural_word(
+        string $word,
+        int $count,
+        string $endings,
+    ): string {
         $endings = preg_split('/[,\|-]/', $endings);
         $cases = [2, 0, 1, 1, 1, 2];
         $ending = sprintf($endings[($count % 100 > 4 && $count % 100 < 20) ? 2 : $cases[min($count % 10, 5)]], $count);
@@ -841,13 +676,7 @@ if (!function_exists('plural_word')) {
 }
 
 if (!function_exists('closetags')) {
-    /**
-     * closetags
-     *
-     * @param  string $html
-     * @return string
-     */
-    function closetags(string $html)
+    function closetags(string $html): string
     {
         #put all opened tags into an array
         preg_match_all("#<([a-z]+)( .*)?(?!/)>#iU", $html, $result);
@@ -879,14 +708,11 @@ if (!function_exists('closetags')) {
 }
 
 if (!function_exists('plural_text')) {
-    /**
-     * Example usage: plural_text('Перенесли 2 черновик%s в товары.', '|а|ов');
-     * @param string $text
-     * @param string $endings
-     * @return string
-     */
-    function plural_text(string $text, string $endings)
-    {
+    // Example usage: plural_text('Перенесли 2 черновик%s в товары.', '|а|ов');
+    function plural_text(
+        string $text,
+        string $endings,
+    ): string {
         if (!preg_match('/(\d+)/', $text, $match)) {
             return $text;
         }
@@ -896,21 +722,14 @@ if (!function_exists('plural_text')) {
         $cases = [2, 0, 1, 1, 1, 2];
         $ending = sprintf($endings[($count % 100 > 4 && $count % 100 < 20) ? 2 : $cases[min($count % 10, 5)]], $count);
 
-        $text = str_replace('%s', $ending, $text);
-
-        return $text;
+        return str_replace('%s', $ending, $text);
     }
 }
 
 if (!function_exists('camel_to_snake_case')) {
-    /**
-     * camel_to_snake_case
-     *
-     * @param  string $input
-     * @return string
-     */
-    function camel_to_snake_case(string $input)
-    {
+    function camel_to_snake_case(
+        string $input,
+    ): string {
         preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];
         foreach ($ret as &$match) {
@@ -921,15 +740,10 @@ if (!function_exists('camel_to_snake_case')) {
 }
 
 if (!function_exists('dots_to_camel_case')) {
-    /**
-     * dots_to_camel_case
-     *
-     * @param  string $string
-     * @param  bool $capitalizeFirstCharacter
-     * @return string
-     */
-    function dots_to_camel_case(string $string, bool $capitalizeFirstCharacter = false)
-    {
+    function dots_to_camel_case(
+        string $string,
+        bool $capitalizeFirstCharacter = false,
+    ): string {
         $str = str_replace('.', '', ucwords($string, '.'));
 
         if (!$capitalizeFirstCharacter) {
@@ -941,17 +755,12 @@ if (!function_exists('dots_to_camel_case')) {
 }
 
 if (!function_exists('in_array_wildcard')) {
-    /**
-     * in_array_wildcard
-     *
-     * @param  mixed $needle
-     * @param  array $array
-     * @return bool
-     */
-    function in_array_wildcard($needle, array $haystack)
-    {
+    function in_array_wildcard(
+        mixed $needle,
+        array $haystack,
+    ): bool {
         foreach ($haystack as $pattern) {
-            if (\Illuminate\Support\Str::is($pattern, $needle)) {
+            if (Str::is($pattern, $needle)) {
                 return true;
             }
         }
@@ -961,7 +770,7 @@ if (!function_exists('in_array_wildcard')) {
 }
 
 if (!function_exists('youtube_id')) {
-    function youtube_id($url)
+    function youtube_id(string $url): string
     {
         if (preg_match('/youtube\.com\/watch\?v=([^\&\?\/]+)/', $url, $matches)) {
             $id = $matches[1];
@@ -982,17 +791,12 @@ if (!function_exists('youtube_id')) {
 }
 
 if (!function_exists('str_contains')) {
-    /**
-     * str_contains
-     *
-     * @param  mixed $haystack
-     * @param  mixed $needles
-     * @return bool
-     */
-    function str_contains($haystack, $needles)
-    {
-        foreach ((array) $needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) !== false) return true;
+    function str_contains(
+        string $haystack,
+        array $needles,
+    ): bool {
+        foreach ((array)$needles as $needle) {
+            if ($needle != '' && str_contains($haystack, $needle)) return true;
         }
 
         return false;
@@ -1001,12 +805,7 @@ if (!function_exists('str_contains')) {
 
 
 if (!function_exists('get_ip')) {
-    /**
-     * get_ip
-     *
-     * @return string
-     */
-    function get_ip()
+    function get_ip(): string
     {
         $ip = request()->ip();
 
@@ -1026,15 +825,10 @@ if (!function_exists('get_ip')) {
 
 
 if (!function_exists('ipv4_match_mask')) {
-    /**
-     * ipv4_match_mask
-     *
-     * @param  string $ip
-     * @param  string $network
-     * @return bool
-     */
-    function ipv4_match_mask(string $ip, string $network)
-    {
+    function ipv4_match_mask(
+        string $ip,
+        string $network,
+    ): bool {
         $ipv4_arr = explode('/', $network);
 
         if (count($ipv4_arr) == 1) {
@@ -1052,15 +846,10 @@ if (!function_exists('ipv4_match_mask')) {
 }
 
 if (!function_exists('ipv4_in_range')) {
-    /**
-     * ipv4_in_range
-     *
-     * @param  mixed $ip
-     * @param  mixed $range
-     * @return bool
-     */
-    function ipv4_in_range($ip, $range)
-    {
+    function ipv4_in_range(
+        mixed $ip,
+        array|string $range,
+    ): bool {
         if (is_array($range)) {
             foreach ($range as $iprange) {
                 if (ipv4_in_range($ip, $iprange)) {
@@ -1087,72 +876,43 @@ if (!function_exists('ipv4_in_range')) {
 }
 
 /**
- * Condition helperes
+ * Conditional helpers
  *
  */
 
 if (!function_exists('valueIsPercentage')) {
-    /**
-     * check if value is a percentage
-     *
-     * @param $value
-     * @return bool
-     */
-    function valueIsPercentage($value)
+    function valueIsPercentage(string $value): bool
     {
         return (preg_match('/%/', $value) == 1);
     }
 }
 
 if (!function_exists('valueIsToBeSubtracted')) {
-    /**
-     * check if value is a subtract
-     *
-     * @param $value
-     * @return bool
-     */
-    function valueIsToBeSubtracted($value)
+    function valueIsToBeSubtracted(string $value): bool
     {
         return (preg_match('/\-/', $value) == 1);
     }
 }
 
 if (!function_exists('valueIsToBeAdded')) {
-    /**
-     * check if value is to be added
-     *
-     * @param $value
-     * @return bool
-     */
-    function valueIsToBeAdded($value)
+    function valueIsToBeAdded(string $value): bool
     {
         return (preg_match('/\+/', $value) == 1);
     }
 }
 
 if (!function_exists('cleanConditionValue')) {
-    /**
-     * removes some arithmetic signs (%,+,-) only
-     *
-     * @param $value
-     * @return mixed
-     */
-    function cleanConditionValue($value)
+    function cleanConditionValue(string|array $value): string|array
     {
-        return str_replace(array('%', '-', '+'), '', $value);
+        return str_replace(['%', '-', '+'], '', $value);
     }
 }
 
 if (!function_exists('condition_value')) {
-    /**
-     * condition_value
-     *
-     * @param  mixed $amount
-     * @param  mixed $conditionValue
-     * @return float
-     */
-    function condition_value($amount, $conditionValue = null)
-    {
+    function condition_value(
+        string|int|float $amount,
+        string|null $conditionValue = null,
+    ): string|int|float {
         if (!$conditionValue)
             return $amount;
 
@@ -1166,48 +926,46 @@ if (!function_exists('condition_value')) {
     }
 }
 
-if (!function_exists('from_timestamp')) {
-    function from_timestamp($timestamp)
-    {
-        return Carbon::createFromTimestamp($timestamp);
-    }
-}
-
 if (!function_exists('apply_condition')) {
-    /**
-     * apply_condition
-     *
-     * @param  mixed $amount
-     * @param  mixed $conditionValue
-     * @return float
-     */
-    function apply_condition($amount, $conditionValue = null)
-    {
-        if (!$conditionValue) return $amount < 0 ? 0.00 : $amount;
+    function apply_condition(
+        string|int|float $amount,
+        string|null $conditionValue = null,
+    ): float {
+        if (!$conditionValue)
+            return $amount < 0 ? 0.00 : $amount;
 
         $parsedRawValue = condition_value($amount, $conditionValue);
 
-        if (valueIsToBeSubtracted($conditionValue)) {
-            $result = (float) ($amount - $parsedRawValue);
-        } else {
-            $result = (float) ($amount + $parsedRawValue);
-        }
+        $result = valueIsToBeSubtracted($conditionValue)
+            ? (float)($amount - $parsedRawValue)
+            : (float)($amount + $parsedRawValue);
 
         return $result < 0 ? 0.00 : $result;
     }
 }
 
+if (!function_exists('from_timestamp')) {
+    function from_timestamp(
+        string|int $timestamp,
+    ): Carbon {
+        return Carbon::createFromTimestamp($timestamp);
+    }
+}
 
 if (!function_exists('storage_url')) {
-    function storage_url($path, $disk = null)
-    {
+    function storage_url(
+        string $path,
+        string|null $disk = null,
+    ): string {
         return Storage::disk($disk)->url($path);
     }
 }
 
 if (!function_exists('url_data')) {
-    function url_data($string, $action = 'encrypt')
-    {
+    function url_data(
+        string $string,
+        string $action = 'encrypt',
+    ): bool|string {
         $encrypt_method = 'AES-256-CBC';
         $secret_key = config('app.key');
         $secret_iv = md5(config('app.key'));
@@ -1222,9 +980,11 @@ if (!function_exists('url_data')) {
 }
 
 if (!function_exists('uuid')) {
-    function uuid($version = 6)
-    {
+    function uuid(
+        int $version = 6,
+    ): string {
         $method = 'uuid' . $version;
+
         return (string) Uuid::$method();
     }
 }

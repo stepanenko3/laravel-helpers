@@ -8,6 +8,8 @@
     "license": "MIT",
     "require": {
         "php": ">=8.0",
+        "ext-json": "*",
+        "ext-openssl": "*",
         "laravel/framework": "^9.0",
         "hashids/hashids": "^4.1",
         "ramsey/uuid": "^4.0"
