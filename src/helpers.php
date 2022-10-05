@@ -1013,11 +1013,10 @@ if (!function_exists('uuid')) {
 if (!function_exists('natural_language_join')) {
     function natural_language_join(array $list, $conjunction = 'and'): string
     {
-        $oxford_separator = count($list) == 2 ? ' ' : ', ';
         $last = array_pop($list);
 
         if ($list) {
-            return implode(', ', $list) . $oxford_separator . $conjunction . ' ' . $last;
+          return implode(', ', $list) . ' ' . $conjunction . ' ' . $last;
         }
 
         return $last;
