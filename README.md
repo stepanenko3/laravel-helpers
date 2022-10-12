@@ -152,7 +152,7 @@ truncate_html(string $text, int $length = 100, array $options = []): string
 
 url_data(string $string, string $action = 'encrypt'): bool|string
 
-user(): \App\Models\User|null
+user()
 
 utf8ize(array|string $d): string
 
