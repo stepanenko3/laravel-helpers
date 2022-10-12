@@ -77,7 +77,7 @@ if (!function_exists('get_initials')) {
 }
 
 if (!function_exists('user')) {
-    function user(): User | null
+    function user()
     {
         return request()->is('api/*')
             ? auth()->guard('api')->user()
