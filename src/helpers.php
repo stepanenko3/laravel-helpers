@@ -546,7 +546,7 @@ if (!function_exists('number')) {
 }
 
 if (!function_exists('utf8ize')) {
-    function utf8ize(array | string $d): string
+    function utf8ize(array | string $d): string | array
     {
         if (is_array($d)) {
             foreach ($d as $k => $v) {
