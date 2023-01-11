@@ -10,8 +10,9 @@
         "php": ">=8.0",
         "ext-json": "*",
         "ext-openssl": "*",
-        "laravel/framework": "^9.0",
         "hashids/hashids": "^4.1",
+        "laravel/framework": "^9.0",
+        "laravel/pint": "^1.2",
         "ramsey/uuid": "^4.0"
     },
     "autoload": {
