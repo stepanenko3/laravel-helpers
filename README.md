@@ -117,6 +117,8 @@ mb_ucfirst(string $string): string
 
 model_by_key(string $key): ?string
 
+natural_language_join(array $list, $conjunction = 'and'): string
+
 normalizePrice(string|int|float $price): float
 
 number(string|int|float $value, null|int $decimals = 0): string
