@@ -1022,3 +1022,58 @@ if (!function_exists('natural_language_join')) {
         return $last;
     }
 }
+
+if (!function_exists('random_code_chars')) {
+    /**
+     * Function providing random chars pool for the random_code generation.
+     *
+     * @param bool $only_letters
+     * @return array
+     */
+    function random_code_chars(bool $only_letters = false): array
+    {
+        $letters = [
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
+            'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+        ];
+        $numbers = [
+            '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        ];
+
+        return $only_letters ? $letters : array_merge($numbers, $letters);
+    }
+}
+
+if (!function_exists('random_code')) {
+    /**
+     * Function to generate random code strings (upper case) - does not have characters that can be mistaken (0/O, l/1) etc
+     *
+     *
+     * Uniqueness depending on code length (assuming random_code_chars returns 33 characters):
+     * 7 -> 30,995,231,256 available values
+     * 6 ->    939,249,432
+     * 5 ->     28,462,104
+     * 4 ->        862,488
+     *
+     * @param int $length
+     *            number of characters in the generated string
+     * @return string a new string is created with random characters of the desired length
+     */
+    function random_code(int $length = 7): string
+    {
+        srand(microtime(true) * 1000000);
+
+        // our array add all letters and numbers if you wish
+        $chars = random_code_chars();
+
+        $letters = random_code_chars(true);
+        $randstr = $letters[rand(0, count($letters) - 1)];
+
+        for ($rand = 2; $rand <= $length; $rand++) {
+            $random = rand(0, count($chars) - 1);
+            $randstr .= $chars[$random];
+        }
+
+        return $randstr;
+    }
+}
