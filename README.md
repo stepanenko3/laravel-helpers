@@ -130,6 +130,10 @@ plural_text(string $text, string $endings): string
 // Example usage: str_plural_ru('черновик', 2, '|а|ов'); # Return: черновика
 plural_word(string $word, int $count, string $endings): string
 
+random_code_chars(bool $only_letters = false): array
+
+random_code(int $length = 7): string
+
 remove_query_param(string $url, string $param): string
 
 renderBlade(string $string, array|null $data = null): false|string
