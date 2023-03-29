@@ -136,6 +136,8 @@ random_code(int $length = 7): string
 
 remove_query_param(string $url, string $param): string
 
+remove_white_spaces($text): string
+
 renderBlade(string $string, array|null $data = null): false|string
 
 rglob(string $pattern): array|false

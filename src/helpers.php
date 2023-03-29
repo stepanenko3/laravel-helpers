@@ -1077,3 +1077,20 @@ if (!function_exists('random_code')) {
         return $randstr;
     }
 }
+
+
+if (!function_exists('remove_white_spaces')) {
+    /**
+     * Removes multiple white spaces (leaving only 1 between words)
+     *
+     * @param $text
+     * @return string
+     */
+    function remove_white_spaces($text): string
+    {
+        $text = preg_replace('/[\t\n\r\0\x0B]/', '', $text);
+        $text = preg_replace('/(\s)\1+/', ' ', $text);
+        return trim($text);
+    }
+}
+
