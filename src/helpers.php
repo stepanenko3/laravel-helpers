@@ -11,7 +11,7 @@ use Illuminate\View\Factory;
 use Ramsey\Uuid\Uuid;
 
 if (!function_exists('arr_clean_empty_values')) {
-    function arr_clean_empty_values(array $haystack)
+    function arr_clean_empty_values(array $haystack): array
     {
         foreach ($haystack as $key => $value) {
             if (is_array($value)) {
