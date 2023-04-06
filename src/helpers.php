@@ -10,6 +10,25 @@ use Illuminate\Support\Str;
 use Illuminate\View\Factory;
 use Ramsey\Uuid\Uuid;
 
+if (!function_exists('arr_clean_empty_values')) {
+    function arr_clean_empty_values(array $haystack)
+    {
+        foreach ($haystack as $key => $value) {
+            if (is_array($value)) {
+                $haystack[$key] = arr_clean_empty_values(
+                    $value,
+                );
+            }
+
+            if (empty($haystack[$key])) {
+                unset($haystack[$key]);
+            }
+        }
+
+        return $haystack;
+    }
+}
+
 if (!function_exists('getAspectRatio')) {
     function getAspectRatio(int $width, int $height): string
     {
@@ -1016,7 +1035,7 @@ if (!function_exists('natural_language_join')) {
         $last = array_pop($list);
 
         if ($list) {
-          return implode(', ', $list) . ' ' . $conjunction . ' ' . $last;
+            return implode(', ', $list) . ' ' . $conjunction . ' ' . $last;
         }
 
         return $last;
