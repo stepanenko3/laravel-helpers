@@ -20,7 +20,7 @@ if (!function_exists('arr_clean_empty_values')) {
                 );
             }
 
-            if (empty($haystack[$key])) {
+            if (!is_numeric($haystack[$key]) && empty($haystack[$key])) {
                 unset($haystack[$key]);
             }
         }
