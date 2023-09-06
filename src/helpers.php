@@ -1,10 +1,9 @@
 <?php
 
-use App\Models\User;
-use Carbon\Carbon;
 use Hashids\Hashids;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\{Blade, Storage};
 use Illuminate\Support\Str;
 use Illuminate\View\Factory;
