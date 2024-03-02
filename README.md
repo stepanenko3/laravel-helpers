@@ -8,7 +8,7 @@
 ## Requirements
 
 - `php: >=8.0`
-- `laravel/framework: ^9.0`
+- `laravel/framework: ^9.0|^10.0|^11.0
 
 ## Installation
 

@@ -10,10 +10,10 @@
         "php": ">=8.1",
         "ext-json": "*",
         "ext-openssl": "*",
-        "hashids/hashids": "^4.1",
-        "laravel/framework": "^9.0|^10.0",
-        "laravel/pint": "^1.2",
-        "ramsey/uuid": "^4.0"
+        "laravel/framework": "^9.0|^10.0|^11.0",
+        "laravel/pint": "^1.14",
+        "ramsey/uuid": "^4.7",
+        "vinkla/hashids": "^11.0"
     },
     "autoload": {
         "files": [
