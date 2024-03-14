@@ -3,9 +3,8 @@
 use Hashids\Hashids;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\{Blade, Storage};
-use Illuminate\Support\Str;
+use Illuminate\Support\{Carbon, Str};
 use Illuminate\View\Factory;
 use Ramsey\Uuid\Uuid;
 
@@ -116,7 +115,7 @@ if (!function_exists('contrast_color')) {
 }
 
 if (!function_exists('carbon')) {
-    function carbon(DateTimeInterface | string | null $parseString = '', string $tz = null): Carbon
+    function carbon(DateTimeInterface | string | null $parseString = '', ?string $tz = null): Carbon
     {
         return new Carbon($parseString, $tz);
     }
@@ -162,6 +161,7 @@ if (!function_exists('validateDate')) {
     function validateDate(string $date, string $format = 'Y-m-d'): bool
     {
         $d = DateTime::createFromFormat($format, $date);
+
         // The Y ( 4 digits year ) returns TRUE for any integer with any number of digits so changing the comparison from == to === fixes the issue.
         return $d && $d->format($format) === $date;
     }
@@ -342,8 +342,8 @@ if (!function_exists('mb_pathinfo')) {
 if (!function_exists('toggle_url')) {
     function toggle_url(
         string $key,
-        string | null $value = null,
-        string | null $url = null,
+        ?string $value = null,
+        ?string $url = null,
     ): string {
         $url = $url ?? request()->url();
 
@@ -419,7 +419,7 @@ if (!function_exists('distance')) {
 if (!function_exists('renderBlade')) {
     function renderBlade(
         string $string,
-        array | null $data = null,
+        ?array $data = null,
     ): false | string {
         if (!$data) {
             $data = [];
@@ -497,7 +497,7 @@ if (!function_exists('truncate_html')) {
                     $entitiesLength = 0;
                     if (preg_match_all('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', $tag[3], $entities, PREG_OFFSET_CAPTURE)) {
                         foreach ($entities[0] as $entity) {
-                            if ($entity[1] + 1 - $entitiesLength <= $left) {
+                            if ($left >= $entity[1] + 1 - $entitiesLength) {
                                 $left--;
                                 $entitiesLength += mb_strlen($entity[0]);
                             } else {
@@ -557,7 +557,7 @@ if (!function_exists('truncate_html')) {
 if (!function_exists('number')) {
     function number(
         string | int | float $value,
-        null | int $decimals = 0,
+        ?int $decimals = 0,
     ): string {
         return number_format($value, $decimals, '.', ' ');
     }
@@ -948,7 +948,7 @@ if (!function_exists('cleanConditionValue')) {
 if (!function_exists('condition_value')) {
     function condition_value(
         string | int | float $amount,
-        string | null $conditionValue = null,
+        ?string $conditionValue = null,
     ): string | int | float {
         if (!$conditionValue) {
             return $amount;
@@ -967,7 +967,7 @@ if (!function_exists('condition_value')) {
 if (!function_exists('apply_condition')) {
     function apply_condition(
         string | int | float $amount,
-        string | null $conditionValue = null,
+        ?string $conditionValue = null,
     ): float {
         if (!$conditionValue) {
             return $amount < 0 ? 0.00 : $amount;
@@ -994,7 +994,7 @@ if (!function_exists('from_timestamp')) {
 if (!function_exists('storage_url')) {
     function storage_url(
         string $path,
-        string | null $disk = null,
+        ?string $disk = null,
     ): string {
         return Storage::disk($disk)->url($path);
     }
@@ -1044,9 +1044,6 @@ if (!function_exists('natural_language_join')) {
 if (!function_exists('random_code_chars')) {
     /**
      * Function providing random chars pool for the random_code generation.
-     *
-     * @param bool $only_letters
-     * @return array
      */
     function random_code_chars(bool $only_letters = false): array
     {
@@ -1073,8 +1070,6 @@ if (!function_exists('random_code')) {
      * 5 ->     28,462,104
      * 4 ->        862,488
      *
-     * @param int $length
-     *            number of characters in the generated string
      * @return string a new string is created with random characters of the desired length
      */
     function random_code(int $length = 7): string
