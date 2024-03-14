@@ -68,7 +68,7 @@ if (!function_exists('formatMemory')) {
         $unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $times = floor(log($size, $base));
 
-        $memory = sprintf('%.' . $precision . 'f', $size / pow($base, ($times + $level)));
+        $memory = sprintf('%.' . $precision . 'f', $size / $base ** ($times + $level));
         $unit = $unit[$times + $level];
 
         if ($asArray) {
@@ -345,7 +345,7 @@ if (!function_exists('toggle_url')) {
         ?string $value = null,
         ?string $url = null,
     ): string {
-        $url = $url ?? request()->url();
+        $url ??= request()->url();
 
         $params = request()->all();
 
@@ -383,12 +383,12 @@ if (!function_exists('remove_query_param')) {
         $port = isset($parsed['port']) ? ':' . $parsed['port'] : '';
         $user = $parsed['user'] ?? '';
         $pass = isset($parsed['pass']) ? ':' . $parsed['pass'] : '';
-        $pass = ($user || $pass) ? "$pass@" : '';
+        $pass = ($user || $pass) ? "{$pass}@" : '';
         $path = $parsed['path'] ?? '';
         $query = $query ? '?' . $query : '';
         $fragment = isset($parsed['fragment']) ? '#' . $parsed['fragment'] : '';
 
-        return "$scheme$user$pass$host$port$path$query$fragment";
+        return "{$scheme}{$user}{$pass}{$host}{$port}{$path}{$query}{$fragment}";
     }
 }
 
@@ -406,8 +406,8 @@ if (!function_exists('distance')) {
         $lonTo = deg2rad($longitudeTo);
 
         $lonDelta = $lonTo - $lonFrom;
-        $a = pow(cos($latTo) * sin($lonDelta), 2)
-            + pow(cos($latFrom) * sin($latTo) - sin($latFrom) * cos($latTo) * cos($lonDelta), 2);
+        $a = (cos($latTo) * sin($lonDelta)) ** 2
+            + (cos($latFrom) * sin($latTo) - sin($latFrom) * cos($latTo) * cos($lonDelta)) ** 2;
         $b = sin($latFrom) * sin($latTo) + cos($latFrom) * cos($latTo) * cos($lonDelta);
 
         $angle = atan2(sqrt($a), $b);
@@ -446,7 +446,7 @@ if (!function_exists('renderBlade')) {
                 ob_end_clean();
             }
 
-            throw new ErrorException;
+            throw new ErrorException();
         }
 
         return ob_get_clean();
@@ -509,10 +509,10 @@ if (!function_exists('truncate_html')) {
                     $truncate .= mb_substr($tag[3], 0, $left + $entitiesLength);
 
                     break;
-                } else {
-                    $truncate .= $tag[3];
-                    $totalLength += $contentLength;
                 }
+                $truncate .= $tag[3];
+                $totalLength += $contentLength;
+
                 if ($totalLength >= $length) {
                     break;
                 }
@@ -520,9 +520,8 @@ if (!function_exists('truncate_html')) {
         } else {
             if (mb_strlen($text) <= $length) {
                 return $text;
-            } else {
-                $truncate = mb_substr($text, 0, $length - mb_strlen($ending));
             }
+            $truncate = mb_substr($text, 0, $length - mb_strlen($ending));
         }
 
         if (!$exact) {
@@ -624,7 +623,7 @@ if (!function_exists('is_day')) {
         float $lat = 50.458124677588046,
         float $lng = 30.51755711378018,
     ): bool {
-        $timestamp = $timestamp ?? time();
+        $timestamp ??= time();
 
         $suninfo = date_sun_info($timestamp, $lat, $lng);
 
@@ -653,7 +652,7 @@ if (!function_exists('class_basename')) {
         }
 
         if (!is_string($class)) {
-            $class = get_class($class);
+            $class = $class::class;
         }
 
         $key = explode('\\', $class);
@@ -716,11 +715,11 @@ if (!function_exists('plural_word')) {
 if (!function_exists('closetags')) {
     function closetags(string $html): string
     {
-        //put all opened tags into an array
+        // put all opened tags into an array
         preg_match_all('#<([a-z]+)( .*)?(?!/)>#iU', $html, $result);
         $openedtags = $result[1];
 
-        //put all closed tags into an array
+        // put all closed tags into an array
         preg_match_all('#</([a-z]+)>#iU', $html, $result);
         $closedtags = $result[1];
         $len_opened = count($openedtags);
@@ -847,8 +846,7 @@ if (!function_exists('str_contains')) {
 if (!function_exists('get_ip')) {
     function get_ip(): string
     {
-        $ip = request()->ip();
-
+        return request()->ip();
         // if (in_array_wildcard($ip, ['127.0.0.1', '::1', '192.168.*'])) {
         //     try {
         //         $externalContent = file_get_contents('http://checkip.dyndns.com/');
@@ -858,8 +856,6 @@ if (!function_exists('get_ip')) {
         //         $ip = trim(shell_exec('dig +short myip.opendns.com @resolver1.opendns.com'));
         //     }
         // }
-
-        return $ip;
     }
 }
 
@@ -914,9 +910,7 @@ if (!function_exists('ipv4_in_range')) {
     }
 }
 
-/**
- * Conditional helpers
- */
+// Conditional helpers
 if (!function_exists('valueIsPercentage')) {
     function valueIsPercentage(string $value): bool
     {
@@ -958,9 +952,9 @@ if (!function_exists('condition_value')) {
             $value = normalizePrice(cleanConditionValue($conditionValue));
 
             return $amount * ($value / 100);
-        } else {
-            return normalizePrice(cleanConditionValue($conditionValue));
         }
+
+        return normalizePrice(cleanConditionValue($conditionValue));
     }
 }
 
@@ -1061,8 +1055,7 @@ if (!function_exists('random_code_chars')) {
 
 if (!function_exists('random_code')) {
     /**
-     * Function to generate random code strings (upper case) - does not have characters that can be mistaken (0/O, l/1) etc
-     *
+     * Function to generate random code strings (upper case) - does not have characters that can be mistaken (0/O, l/1) etc.
      *
      * Uniqueness depending on code length (assuming random_code_chars returns 33 characters):
      * 7 -> 30,995,231,256 available values
@@ -1080,10 +1073,10 @@ if (!function_exists('random_code')) {
         $chars = random_code_chars();
 
         $letters = random_code_chars(true);
-        $randstr = $letters[rand(0, count($letters) - 1)];
+        $randstr = $letters[random_int(0, count($letters) - 1)];
 
         for ($rand = 2; $rand <= $length; $rand++) {
-            $random = rand(0, count($chars) - 1);
+            $random = random_int(0, count($chars) - 1);
             $randstr .= $chars[$random];
         }
 
